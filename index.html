@@ -121,6 +121,27 @@
     cursor: pointer;
   }
 
+  .seletor-perfil-wrap {
+    background: var(--ambar-claro);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+  .seletor-perfil-wrap label {
+    color: #7c4a03;
+    font-weight: 600;
+  }
+  .seletor-perfil-wrap select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--cinza-300);
+    font-size: 13px;
+    background: #fff;
+  }
+
   .busca-wrap {
     padding: 0 16px 16px;
   }
@@ -348,6 +369,14 @@
     <button id="btnConfig" aria-label="Configurações">⚙</button>
   </div>
 </header>
+
+<div class="seletor-perfil-wrap">
+  <label for="seletorPerfil">Plantel / CNPJ ativo para o relatório:</label>
+  <select id="seletorPerfil">
+    <option value="ecopark">Eco Park Sol &amp; Mar</option>
+    <option value="mlsilva">M L Silva Sobrinho Pousada LTDA</option>
+  </select>
+</div>
 
 <section class="contadores">
   <div class="stat-card">

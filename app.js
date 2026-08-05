@@ -17,6 +17,21 @@ const MARCA = {
   corSecundaria: '#e0a72e'
 };
 
+// Esse criador opera dois plantéis com CNPJs diferentes no mesmo
+// aparelho/busca. O relatório usa a identidade selecionada aqui.
+const PERFIS_CRIADOR = {
+  ecopark: {
+    nome: 'Eco Park Sol & Mar',
+    cnpj: '32.179.893/0001-70',
+    licenca: '2025.24091693367.EXP.LON (CORRIGIDA)'
+  },
+  mlsilva: {
+    nome: 'M L SILVA SOBRINHO POUSADA LTDA',
+    cnpj: '51.298.383/0001-67',
+    licenca: '2026.21011737577.EXP.LOR'
+  }
+};
+
 function aplicarMarca_() {
   document.documentElement.style.setProperty('--verde', MARCA.corPrimaria);
   document.documentElement.style.setProperty('--ambar', MARCA.corSecundaria);
@@ -690,6 +705,15 @@ async function iniciar() {
   DB = await dbAbrir();
   await carregarConfig();
 
+  const perfilSalvo = await dbGet('config', 'perfilCriador');
+  const seletorPerfil = document.getElementById('seletorPerfil');
+  if (seletorPerfil) {
+    seletorPerfil.value = (perfilSalvo && perfilSalvo.valor) || 'ecopark';
+    seletorPerfil.addEventListener('change', async function () {
+      await dbPut('config', { chave: 'perfilCriador', valor: seletorPerfil.value });
+    });
+  }
+
   if (!configCompleta()) {
     abrirConfiguracoes(true);
   } else {
@@ -761,10 +785,15 @@ async function iniciar() {
     btn.disabled = true;
     btn.textContent = 'Gerando relatório...';
     try {
+      const chavePerfil = (document.getElementById('seletorPerfil') || {}).value || 'ecopark';
+      const perfil = PERFIS_CRIADOR[chavePerfil] || PERFIS_CRIADOR.ecopark;
       const resultado = await apiPost({
         action: 'gerarRelatorio',
         dataExportacao: isoParaBR_(isoExportacao),
-        dataFiscalizacao: isoParaBR_(isoFiscalizacao)
+        dataFiscalizacao: isoParaBR_(isoFiscalizacao),
+        nomeCriador: perfil.nome,
+        cnpjCriador: perfil.cnpj,
+        licencaCriador: perfil.licenca
       });
       if (resultado.sucesso && resultado.conteudoBase64) {
         salvarBase64ComoArquivo(resultado.conteudoBase64, resultado.nomeArquivo || 'relatorio.pdf', 'application/pdf');
