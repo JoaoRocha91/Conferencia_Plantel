@@ -735,10 +735,20 @@ async function iniciar() {
       mostrarAvisoTopo('É preciso estar online para gerar o relatório.', 'erro');
       return;
     }
+
+    const dataExportacao = window.prompt('Data de referência do plantel (ex: 15/06/2026):', '');
+    if (dataExportacao === null) return; // cancelou
+    const dataFiscalizacao = window.prompt('Data da conferência (ex: 25/07/2026):', '');
+    if (dataFiscalizacao === null) return; // cancelou
+
     btn.disabled = true;
     btn.textContent = 'Gerando relatório...';
     try {
-      const resultado = await apiPost({ action: 'gerarRelatorio' });
+      const resultado = await apiPost({
+        action: 'gerarRelatorio',
+        dataExportacao: dataExportacao,
+        dataFiscalizacao: dataFiscalizacao
+      });
       if (resultado.sucesso && resultado.conteudoBase64) {
         salvarBase64ComoArquivo(resultado.conteudoBase64, resultado.nomeArquivo || 'relatorio.pdf', 'application/pdf');
         mostrarAvisoTopo('Relatório gerado — verifique a pasta de downloads do aparelho.', 'sucesso');
