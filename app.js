@@ -431,6 +431,14 @@ function definirStatusSync(texto) {
   }
 }
 
+// Converte aaaa-mm-dd (valor de <input type="date">) -> dd/mm/aaaa
+function isoParaBR_(iso) {
+  if (!iso) return '';
+  const partes = iso.split('-');
+  if (partes.length !== 3) return '';
+  return partes[2] + '/' + partes[1] + '/' + partes[0];
+}
+
 function mostrarAvisoTopo(msg, tipo) {
   const el = document.getElementById('avisoTopo');
   el.textContent = msg;
@@ -729,25 +737,34 @@ async function iniciar() {
   document.getElementById('btnConfig').addEventListener('click', function () { abrirConfiguracoes(false); });
   document.getElementById('btnFecharConfig').addEventListener('click', fecharConfiguracoes);
 
-  document.getElementById('btnGerarRelatorio').addEventListener('click', async function () {
-    const btn = document.getElementById('btnGerarRelatorio');
+  document.getElementById('btnGerarRelatorio').addEventListener('click', function () {
     if (!navigator.onLine) {
       mostrarAvisoTopo('É preciso estar online para gerar o relatório.', 'erro');
       return;
     }
+    document.getElementById('repDataExportacao').value = '';
+    document.getElementById('repDataFiscalizacao').value = '';
+    document.getElementById('modalRelatorio').classList.add('visivel');
+  });
 
-    const dataExportacao = window.prompt('Data de referência do plantel (ex: 15/06/2026):', '');
-    if (dataExportacao === null) return; // cancelou
-    const dataFiscalizacao = window.prompt('Data da conferência (ex: 25/07/2026):', '');
-    if (dataFiscalizacao === null) return; // cancelou
+  document.getElementById('btnCancelarRelatorio').addEventListener('click', function () {
+    document.getElementById('modalRelatorio').classList.remove('visivel');
+  });
+
+  document.getElementById('formRelatorio').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnGerarRelatorio');
+    const isoExportacao = document.getElementById('repDataExportacao').value;
+    const isoFiscalizacao = document.getElementById('repDataFiscalizacao').value;
+    document.getElementById('modalRelatorio').classList.remove('visivel');
 
     btn.disabled = true;
     btn.textContent = 'Gerando relatório...';
     try {
       const resultado = await apiPost({
         action: 'gerarRelatorio',
-        dataExportacao: dataExportacao,
-        dataFiscalizacao: dataFiscalizacao
+        dataExportacao: isoParaBR_(isoExportacao),
+        dataFiscalizacao: isoParaBR_(isoFiscalizacao)
       });
       if (resultado.sucesso && resultado.conteudoBase64) {
         salvarBase64ComoArquivo(resultado.conteudoBase64, resultado.nomeArquivo || 'relatorio.pdf', 'application/pdf');

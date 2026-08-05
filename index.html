@@ -414,6 +414,22 @@
   </div>
 </div>
 
+<div id="modalRelatorio" class="modal-overlay">
+  <div class="modal-caixa">
+    <h2>Gerar Relatório</h2>
+    <form id="formRelatorio">
+      <label for="repDataExportacao">Data de referência do plantel</label>
+      <input type="date" id="repDataExportacao" required>
+      <label for="repDataFiscalizacao">Data da conferência</label>
+      <input type="date" id="repDataFiscalizacao" required>
+      <div class="modal-botoes">
+        <button type="button" id="btnCancelarRelatorio">Cancelar</button>
+        <button type="submit">Gerar Relatório</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="./app.js"></script>
 </body>
 </html>
