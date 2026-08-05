@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Eco Park Sol & Mar — Conferência de Plantel</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#2c6b80">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+  :root {
+    --verde: #0b3d2e;
+    --verde-claro: #14532d;
+    --ambar: #d97706;
+    --ambar-claro: #fef3c7;
+    --sucesso: #15803d;
+    --sucesso-claro: #dcfce7;
+    --perigo: #b91c1c;
+    --perigo-claro: #fee2e2;
+    --aviso: #ca8a04;
+    --aviso-claro: #fef9c3;
+    --cinza-100: #f4f4f2;
+    --cinza-300: #d4d4d0;
+    --cinza-600: #57534e;
+    --cinza-900: #1c1917;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--cinza-100);
+    color: var(--cinza-900);
+    font-size: 18px;
+  }
+  header {
+    background: var(--verde);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  header h1 {
+    font-size: 19px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .header-direita { display: flex; align-items: center; gap: 12px; }
+  .status-sync {
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .status-ok { background: var(--sucesso-claro); color: var(--sucesso); }
+  .status-offline { background: var(--cinza-300); color: var(--cinza-600); }
+  .status-erro { background: var(--perigo-claro); color: var(--perigo); }
+  .status-carregando { background: var(--ambar-claro); color: var(--ambar); }
+  #btnConfig {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .contadores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid var(--cinza-300);
+  }
+  .stat-valor { font-size: 24px; font-weight: 700; display: block; }
+  .stat-label { font-size: 12px; color: var(--cinza-600); }
+  #ctdVerificados { color: var(--sucesso); }
+  #ctdDivergencias { color: var(--ambar); }
+  #ctdPendentes { color: var(--aviso); }
+
+  .progresso-wrap {
+    margin: 0 16px 12px;
+    background: var(--cinza-300);
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+  }
+  #barraProgresso {
+    height: 100%;
+    background: var(--sucesso);
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .bloco-fila {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--ambar-claro);
+    color: #7c4a03;
+    margin: 0 16px 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+  .bloco-fila button {
+    background: var(--ambar);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .busca-wrap {
+    padding: 0 16px 16px;
+  }
+  .busca-wrap label {
+    display: block;
+    font-size: 14px;
+    color: var(--cinza-600);
+    margin-bottom: 6px;
+  }
+  #campoBusca {
+    width: 100%;
+    font-size: 24px;
+    padding: 16px;
+    border: 2px solid var(--verde);
+    border-radius: 12px;
+    outline: none;
+  }
+  #campoBusca:focus { border-color: var(--ambar); }
+
+  #painelResultado {
+    display: none;
+    padding: 0 16px 24px;
+  }
+  #painelResultado.visivel { display: block; }
+
+  .cartao {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid var(--cinza-300);
+    padding: 18px;
+  }
+  .cartao-vazio { text-align: center; color: var(--cinza-600); padding: 32px 18px; }
+
+  .cartao-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .cartao-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .status-verificado .cartao-status { background: var(--sucesso-claro); color: var(--sucesso); }
+  .status-pendente .cartao-status { background: var(--cinza-300); color: var(--cinza-600); }
+  .status-nao-localizado .cartao-status { background: var(--perigo-claro); color: var(--perigo); }
+  .status-divergente .cartao-status { background: var(--aviso-claro); color: var(--aviso); }
+  .cartao-tag { font-size: 12px; color: var(--cinza-600); }
+
+  .cartao h2 { margin: 4px 0 2px; font-size: 22px; }
+  .nome-popular { margin: 0 0 12px; color: var(--cinza-600); font-style: italic; }
+
+  .dados-animal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+    margin: 0 0 14px;
+    font-size: 15px;
+  }
+  .dados-animal dt { color: var(--cinza-600); font-size: 13px; }
+  .dados-animal dd { margin: 0; font-weight: 600; }
+
+  .campo-obs {
+    width: 100%;
+    min-height: 60px;
+    padding: 10px;
+    border: 1px solid var(--cinza-300);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    margin-bottom: 14px;
+    resize: vertical;
+  }
+
+  .botao-confirmar {
+    width: 100%;
+    background: var(--verde);
+    color: #fff;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .botao-confirmar:disabled { background: var(--cinza-300); color: var(--cinza-600); cursor: not-allowed; }
+
+  .botao-secundario {
+    width: 100%;
+    background: none;
+    border: 1px solid var(--cinza-300);
+    color: var(--cinza-600);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .botao-secundario:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .aviso-ambiguo { margin: 0 0 12px; font-weight: 600; color: var(--aviso); }
+  .lista-selecao { display: flex; flex-direction: column; gap: 8px; }
+  .item-lista {
+    text-align: left;
+    background: var(--cinza-100);
+    border: 1px solid var(--cinza-300);
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .item-lista span { font-size: 13px; color: var(--cinza-600); }
+
+  footer {
+    padding: 12px 16px 28px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  #btnAtualizarCache, #btnGerarRelatorio, #btnImportarPlantel {
+    background: none;
+    border: 1px solid var(--cinza-300);
+    color: var(--cinza-600);
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .aviso-topo {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: none;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+  }
+  .aviso-topo.visivel { display: block; }
+  .aviso-sucesso { background: var(--sucesso-claro); color: var(--sucesso); }
+  .aviso-erro { background: var(--perigo-claro); color: var(--perigo); }
+  .aviso-aviso { background: var(--ambar-claro); color: #7c4a03; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    padding: 16px;
+  }
+  .modal-overlay.visivel { display: flex; }
+  .modal-caixa {
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .modal-caixa h2 { margin-top: 0; font-size: 18px; }
+  .modal-caixa label {
+    display: block;
+    font-size: 13px;
+    color: var(--cinza-600);
+    margin: 12px 0 4px;
+  }
+  .modal-caixa input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--cinza-300);
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  .modal-botoes {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .modal-botoes button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+  }
+  #formConfig button[type=submit] { background: var(--verde); color: #fff; }
+  #btnFecharConfig { background: var(--cinza-100); color: var(--cinza-900); border: 1px solid var(--cinza-300) !important; }
+</style>
+</head>
+<body>
+
+<div id="avisoTopo" class="aviso-topo"></div>
+
+<header>
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <img id="logoMarca" alt="" style="height: 26px; display: none; border-radius: 4px;">
+    <h1 id="tituloApp">Conferência de plantel</h1>
+  </div>
+  <div class="header-direita">
+    <span id="statusSync" class="status-sync status-carregando">Iniciando…</span>
+    <button id="btnConfig" aria-label="Configurações">⚙</button>
+  </div>
+</header>
+
+<section class="contadores">
+  <div class="stat-card">
+    <span class="stat-valor" id="ctdTotal">—</span>
+    <span class="stat-label">Total</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-valor" id="ctdVerificados">—</span>
+    <span class="stat-label">Verificados</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-valor" id="ctdDivergencias">—</span>
+    <span class="stat-label">Divergências</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-valor" id="ctdPendentes">—</span>
+    <span class="stat-label">Pendentes</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-valor" id="ctdPercentual">—</span>
+    <span class="stat-label">Concluído</span>
+  </div>
+</section>
+<div class="progresso-wrap"><div id="barraProgresso"></div></div>
+
+<div id="blocoFila" class="bloco-fila">
+  <span><span id="filaContagem">0</span> leitura(s) aguardando sincronização</span>
+  <button id="btnSincronizarAgora">Sincronizar agora</button>
+</div>
+
+<div class="busca-wrap">
+  <label for="campoBusca">Leia o microchip ou digite o código</label>
+  <input type="text" id="campoBusca" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled placeholder="Aguardando leitura…">
+</div>
+
+<div id="painelResultado"></div>
+
+<footer>
+  <button id="btnAtualizarCache">Atualizar cache do plantel</button>
+  <button id="btnGerarRelatorio">Gerar Relatório PDF</button>
+  <button id="btnImportarPlantel">Importar Plantel</button>
+  <input type="file" id="arquivoImportar" accept=".xls,.csv,.txt" style="display:none">
+</footer>
+
+<div id="modalConfig" class="modal-overlay">
+  <div class="modal-caixa">
+    <h2>Configuração</h2>
+    <form id="formConfig">
+      <label for="cfgUrl">URL da Web App (Apps Script)</label>
+      <input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/.../exec" required>
+      <label for="cfgToken">Token de acesso</label>
+      <input type="text" id="cfgToken" required>
+      <label for="cfgTecnico">Seu nome (técnico)</label>
+      <input type="text" id="cfgTecnico" required>
+      <div class="modal-botoes">
+        <button type="button" id="btnFecharConfig">Cancelar</button>
+        <button type="submit">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
