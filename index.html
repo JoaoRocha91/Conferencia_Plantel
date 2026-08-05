@@ -146,6 +146,20 @@
   }
   #painelResultado.visivel { display: block; }
 
+  .marca-vazia {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    opacity: 0.16;
+  }
+  .marca-vazia img {
+    max-width: 240px;
+    max-height: 240px;
+    width: 100%;
+    object-fit: contain;
+  }
+
   .cartao {
     background: #fff;
     border-radius: 14px;
@@ -369,7 +383,11 @@
   <input type="text" id="campoBusca" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled placeholder="Aguardando leitura…">
 </div>
 
-<div id="painelResultado"></div>
+<div id="painelResultado" class="visivel">
+  <div class="marca-vazia">
+    <img id="logoGrande" alt="">
+  </div>
+</div>
 
 <footer>
   <button id="btnAtualizarCache">Atualizar cache do plantel</button>

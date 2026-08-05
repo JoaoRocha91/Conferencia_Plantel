@@ -30,6 +30,11 @@ function aplicarMarca_() {
     logo.src = MARCA.logoUrl;
     logo.style.display = 'inline-block';
   }
+
+  const logoGrande = document.getElementById('logoGrande');
+  if (logoGrande && MARCA.logoUrl) {
+    logoGrande.src = MARCA.logoUrl;
+  }
 }
 
 // ===== IndexedDB — wrapper mínimo em Promises =====
