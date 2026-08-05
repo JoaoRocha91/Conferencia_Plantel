@@ -2,7 +2,7 @@
 // Chamadas para a Web App do Apps Script NUNCA passam por aqui: o app.js
 // já trata online/offline sozinho (cache em IndexedDB + fila de sincronização).
 
-const CACHE_NAME = 'plantel-shell-v3';
+const CACHE_NAME = 'plantel-shell-v4';
 const ARQUIVOS_SHELL = [
   './',
   './index.html',

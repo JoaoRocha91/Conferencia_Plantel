@@ -39,7 +39,7 @@ function aplicarMarca_() {
 
 // ===== IndexedDB — wrapper mínimo em Promises =====
 
-const DB_NOME = 'plantelDB';
+const DB_NOME = 'plantelDB_ecopark';
 const DB_VERSAO = 2; // v2: chave de 'animais' passou de identificacao para linha
 
 function dbAbrir() {
